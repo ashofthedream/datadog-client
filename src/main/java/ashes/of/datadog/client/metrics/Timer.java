@@ -1,9 +1,12 @@
 package ashes.of.datadog.client.metrics;
 
 import ashes.of.datadog.client.DatadogClient;
+import ashes.of.datadog.client.function.CheckedRunnable;
 
 import java.time.Duration;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.function.*;
 
 
 public class Timer extends Metric<Timer> {
@@ -66,8 +69,177 @@ public class Timer extends Metric<Timer> {
 
 
     public void measure(Runnable runnable) {
-        restart();
-        runnable.run();
-        elapsed();
+        long start = System.nanoTime();
+        try {
+            runnable.run();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
     }
+
+    public Runnable measured(Runnable runnable) {
+        return () -> measure(runnable);
+    }
+
+
+    public void measureChecked(CheckedRunnable runnable) throws Exception {
+        long start = System.nanoTime();
+        try {
+            runnable.run();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+    public CheckedRunnable measuredChecked(CheckedRunnable runnable) {
+        return () -> measuredChecked(runnable);
+    }
+
+    
+    public <T> void measure(Consumer<T> c, T a) {
+        measure(() -> c.accept(a));
+
+    }
+
+    public <T> Consumer<T> measured(Consumer<T> c) {
+        return a -> measure(c, a);
+    }
+
+    
+    public void measure(IntConsumer c, int a) {
+        measure(() -> c.accept(a));
+    }
+
+    public IntConsumer measured(IntConsumer c) {
+        return a -> measure(c, a);
+    }
+
+
+    public void measure(LongConsumer c, long a) {
+        measure(() -> c.accept(a));
+    }
+
+    public LongConsumer measured(LongConsumer c) {
+        return a -> measure(c, a);
+    }
+
+
+    public void measure(DoubleConsumer c, double a) {
+        measure(() -> c.accept(a));
+    }
+
+    public DoubleConsumer measured(DoubleConsumer c) {
+        return a -> measure(c, a);
+    }
+
+
+
+    public <A, B> void measure(BiConsumer<A, B> c, A a, B b) {
+        measure(() -> c.accept(a, b));
+    }
+
+    public <A, B> BiConsumer<A, B> measured(BiConsumer<A, B> c) {
+        return (a, b) -> measure(c, a, b);
+    }
+
+
+
+    public <A, R> R measure(Function<A, R> f, A a) {
+        return measure(() -> f.apply(a));
+    }
+
+    public <A, R> Function<A, R> measured(Function<A, R> f) {
+        return a -> measure(f, a);
+    }
+
+
+    public <A, B, R> R measure(BiFunction<A, B, R> f, A a, B b) {
+        return measure(() -> f.apply(a, b));
+    }
+
+    public <A, B, R> BiFunction<A, B, R> measured(BiFunction<A, B, R> f) {
+        return (a, b) -> measure(f, a, b);
+    }
+
+
+
+    public <T> T measure(Supplier<T> s) {
+        long start = System.nanoTime();
+        try {
+            return s.get();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+    public <T> Supplier<T> measured(Supplier<T> s) {
+        return () -> measure(s);
+    }
+
+
+    public <T> T measureChecked(Callable<T> c) throws Exception {
+        long start = System.nanoTime();
+        try {
+            return c.call();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+
+    public int measure(IntSupplier s) {
+        long start = System.nanoTime();
+        try {
+            return s.getAsInt();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+    public IntSupplier measured(IntSupplier s) {
+        return () -> measure(s);
+    }
+
+
+    public long measure(LongSupplier s) {
+        long start = System.nanoTime();
+        try {
+            return s.getAsLong();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+    public LongSupplier measured(LongSupplier s) {
+        return () -> measure(s);
+    }
+
+
+    public double measure(DoubleSupplier s) {
+        long start = System.nanoTime();
+        try {
+            return s.getAsDouble();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+    public DoubleSupplier measured(DoubleSupplier s) {
+        return () -> measure(s);
+    }
+
+
+    public boolean measure(BooleanSupplier s) {
+        long start = System.nanoTime();
+        try {
+            return s.getAsBoolean();
+        } finally {
+            nanos(System.nanoTime() - start);
+        }
+    }
+
+    public BooleanSupplier measured(BooleanSupplier s) {
+        return () -> measure(s);
+    }
+
 }
