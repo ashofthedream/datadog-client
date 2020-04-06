@@ -2,6 +2,7 @@
 plugins {
     id 'java'
     id 'maven'
+    id 'maven-publish'
 }
 
 group = 'ashes.of'
@@ -13,9 +14,29 @@ targetCompatibility = '1.8'
 
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/ashofthedream/datadog-client")
+            credentials {
+                username = project.findProperty("github.username") as String ?: System.getenv("GITHUB_USERNAME")
+                password = project.findProperty("github.token") as String ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            groupId = 'ashes.of'
+            artifactId = 'datadog-client'
+            from components.java
+        }
+    }
+}
 
 dependencies {
     compile     group: 'io.netty',                      name: 'netty-buffer',                   version: '4.1.22.Final'

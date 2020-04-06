@@ -3,7 +3,7 @@ Maven dependency:
 <dependency>
     <groupId>ashes.of</groupId>
     <artifactId>datadog-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
