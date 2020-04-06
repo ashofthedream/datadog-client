@@ -10,12 +10,11 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 public class DatadogServer {
@@ -28,7 +27,7 @@ public class DatadogServer {
 
 
     public DatadogServer(InetSocketAddress address) {
-        this(address, new ArrayBlockingQueue<>(1024));
+        this(address, new ArrayBlockingQueue<>(65536));
     }
 
     public DatadogServer(InetSocketAddress address, BlockingQueue<String> queue) {
@@ -86,6 +85,11 @@ public class DatadogServer {
         thread.start();
     }
 
+    public void startAndJoin() throws InterruptedException {
+        thread.start();
+        thread.join();
+    }
+
     public void stop() {
         socket.close();
         thread.interrupt();
@@ -94,5 +98,26 @@ public class DatadogServer {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String... args) throws InterruptedException {
+        DatadogServer server = new DatadogServer(new InetSocketAddress("localhost", 31337));
+        server.start();
+
+        AtomicLong counter = new AtomicLong();
+
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(() -> {
+            System.out.printf("%20s %,20d %,20d\n", Instant.now(), counter.getAndSet(0), server.queue.size());
+
+        }, 0, 5, TimeUnit.SECONDS);
+
+        while (true) {
+            String metric = server.poll();
+
+            if (metric != null)
+                counter.incrementAndGet();
+        }
+
+
     }
 }

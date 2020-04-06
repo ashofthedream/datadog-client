@@ -15,7 +15,9 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -81,21 +83,21 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
 
 
     @Override
-    protected void send(String metric, long value, MetricType type, String... tags) {
+    protected void send(String metric, long value, MetricType type, Tags tags) {
         buffer.publishEvent((b, seq) -> writeMetric(b, prefix, metric, type, tags, buf -> BufferFormatter.append(b, value) ));
     }
 
     @Override
-    protected void send(String metric, double value, MetricType type, String... tags) {
+    protected void send(String metric, double value, MetricType type, Tags tags) {
         buffer.publishEvent((b, seq) -> writeMetric(b, prefix, metric, type, tags, buf -> BufferFormatter.append(buf, value, 6, false) ));
     }
 
     @Override
-    protected void send(String metric, String value, MetricType type, String... tags) {
+    protected void send(String metric, String value, MetricType type, Tags tags) {
         buffer.publishEvent((b, seq) -> writeMetric(b, prefix, metric, type, tags, buf -> BufferFormatter.append(b, value) ));
     }
 
-    private void writeMetric(ByteBuf b, @Nullable String prefix, String metric, MetricType type, String[] tags, Consumer<ByteBuf> valueWriter) {
+    private void writeMetric(ByteBuf b, @Nullable String prefix, String metric, MetricType type, Tags tags, Consumer<ByteBuf> valueWriter) {
         b.clear();
 
         if (prefix != null) {
@@ -110,12 +112,13 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
         b.writeByte('|');
         b.writeByte(type.getType());
 
-        writeTags(b, taggable().tags(), tags);
+
+        writeTags(b, global, tags);
     }
 
-    private void writeTags(ByteBuf b, String[] global, String[] tags) {
-        boolean hasGlobalTags = global.length > 0;
-        boolean hasAdditionalTags = tags != null && tags.length > 0;
+    private void writeTags(ByteBuf b, Tags global, Tags metric) {
+        boolean hasGlobalTags = !global.isEmpty();
+        boolean hasAdditionalTags = !metric.isEmpty();
         if (hasGlobalTags || hasAdditionalTags) {
             b.writeByte('|');
             b.writeByte('#');
@@ -129,13 +132,16 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
         if (hasGlobalTags)
             b.writeByte(',');
 
-        writeTags(b, tags);
+        writeTags(b, metric);
     }
 
-    private void writeTags(ByteBuf b, String[] tags) {
-        for (int i = 0; i < tags.length; i++) {
-            b.writeCharSequence(tags[i], UTF_8);
-            if (i < tags.length - 1)
+    private void writeTags(ByteBuf b, Tags tags) {
+        List<Supplier<String>> list = tags.list();
+        for (int i = 0; i < list.size(); i++) {
+            String tag = list.get(i).get();
+
+            b.writeCharSequence(tag, UTF_8);
+            if (i < list.size() - 1)
                 b.writeByte(',');
         }
     }
@@ -145,7 +151,7 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
      * @param event event
      */
     @Override
-    public void send(Event event) {
+    public void event(Event event) {
         buffer.publishEvent((b, seq) -> writeEvent(b, event));
     }
 
@@ -206,7 +212,7 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
             b.writeCharSequence(alert.name().toLowerCase(), UTF_8);
         }
 
-        writeTags(b, taggable().tags(), event.tags());
+        writeTags(b, global, event.tags());
     }
 
 
@@ -214,7 +220,7 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
      * @param check service check
      */
     @Override
-    public void send(ServiceCheck check) {
+    public void serviceCheck(ServiceCheck check) {
         buffer.publishEvent((b, seq) -> writeServiceCheck(b, check));
     }
 
@@ -243,7 +249,7 @@ public class DisruptorDatadogClient extends AbstractDatadogClient {
             b.writeCharSequence(hostname, UTF_8);
         }
 
-        writeTags(b, taggable().tags(), check.tags());
+        writeTags(b, global, check.tags());
 
         String message = check.getMessage();
         if (message != null) {

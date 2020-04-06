@@ -24,11 +24,11 @@ public class MockDatadogClient extends AbstractDatadogClient {
     public void stop() {}
 
     @Override
-    protected void send(String metric, String value, MetricType type, String... tags) {}
+    protected void send(String metric, String value, MetricType type, Tags tags) {}
 
     @Override
-    public void send(Event event) {}
+    public void event(Event event) {}
 
     @Override
-    public void send(ServiceCheck check) {}
+    public void serviceCheck(ServiceCheck check) {}
 }

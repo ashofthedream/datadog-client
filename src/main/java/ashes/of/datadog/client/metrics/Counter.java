@@ -15,7 +15,7 @@ public class Counter extends Metric<Counter> {
      * @param value counter value
      */
     public void count(long value) {
-        client.count(name, value, tags());
+        client.count(name, value, tags);
     }
 
     /**

@@ -33,7 +33,7 @@ public class Histogram extends Metric<Histogram> {
      * @param value histogram value
      */
     public void value(long value) {
-        client.histogram(name, value, tags());
+        client.histogram(name, value, tags);
     }
 
     /**
@@ -42,6 +42,6 @@ public class Histogram extends Metric<Histogram> {
      * @param value histogram value
      */
     public void value(double value) {
-        client.histogram(name, value, tags());
+        client.histogram(name, value, tags);
     }
 }

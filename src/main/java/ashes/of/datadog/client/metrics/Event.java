@@ -160,6 +160,6 @@ public class Event extends Metric<Event> {
 
 
     public void send() {
-        client.send(this);
+        client.event(this);
     }
 }

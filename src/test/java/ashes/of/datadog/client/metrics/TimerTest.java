@@ -47,7 +47,7 @@ public class TimerTest extends MetricsTest {
 
     /**
      * @see Timer#measure(Runnable)
-     * @see Timer#measured(Runnable)
+     * @see Timer#wrap(Runnable)
      */
     @Test
     public void measureRunnableShouldSendInvocationTimeInSeconds() {
@@ -55,7 +55,7 @@ public class TimerTest extends MetricsTest {
                 .tag("method", "elapsed")
                 .measure(this::sleep20ms);
 
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
     }
 
     @Test
@@ -68,21 +68,21 @@ public class TimerTest extends MetricsTest {
         } catch (Exception ignore) {
         }
 
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
     }
     
     
     @Test
-    public void measuredRunnableShouldSendTimeInSecondsEveryInvocation() {
+    public void wrappedRunnableShouldSendTimeInSecondsEveryInvocation() {
         Runnable runnable = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::sleep20ms);
+                .wrap(this::sleep20ms);
 
         runnable.run();
         runnable.run();
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
 
@@ -96,7 +96,7 @@ public class TimerTest extends MetricsTest {
                 .tag("method", "elapsed")
                 .measureChecked(this::checkedSleep20ms);
 
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
     }
 
     @Test
@@ -114,77 +114,77 @@ public class TimerTest extends MetricsTest {
 
     /**
      * @see Timer#measure(Consumer, Object)
-     * @see Timer#measured(Consumer)
+     * @see Timer#wrap(Consumer)
      */
     @Test
-    public void measuredConsumerShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedConsumerShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         Consumer<String> c = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::consumerThatSleeps20ms);
+                .wrap(this::consumerThatSleeps20ms);
 
         c.accept("Got it!");
         c.accept("Got it!");
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
     /**
      * @see Timer#measure(BiConsumer, Object, Object)
-     * @see Timer#measured(BiConsumer)
+     * @see Timer#wrap(BiConsumer)
      */
     @Test
-    public void measuredBiConsumerShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedBiConsumerShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         BiConsumer<String, String> c = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::biConsumerThatSleeps20ms);
+                .wrap(this::biConsumerThatSleeps20ms);
 
         c.accept("Got it!", "First");
         c.accept("Got it!", "Second");
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
     /**
      * @see Timer#measure(Function, Object)
-     * @see Timer#measured(Function)
+     * @see Timer#wrap(Function)
      */
     @Test
-    public void measuredFunctionShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedFunctionShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         Function<String, String> f = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::functionThatSleeps20ms);
+                .wrap(this::functionThatSleeps20ms);
 
         assertEquals("Got it!", f.apply("Got it!"));
         assertEquals("Second chance", f.apply("Second chance"));
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
 
     /**
      * @see Timer#measure(BiFunction, Object, Object)
-     * @see Timer#measured(BiFunction)
+     * @see Timer#wrap(BiFunction)
      */
     @Test
-    public void measuredBiFunctionShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedBiFunctionShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         BiFunction<String, String, String> f = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::biFunctionThatSleeps20ms);
+                .wrap(this::biFunctionThatSleeps20ms);
 
         assertEquals("Got it! Nothing", f.apply("Got it!", "Nothing"));
         assertEquals("One more time", f.apply("One more", "time"));
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
 
     /**
      * @see Timer#measure(Supplier)
-     * @see Timer#measured(Supplier)
+     * @see Timer#wrap(Supplier)
      */
     @Test
     public void measureSupplierShouldSendInvocationTimeInSeconds() {
@@ -192,7 +192,7 @@ public class TimerTest extends MetricsTest {
                 .tag("method", "elapsed")
                 .measure(this::stringSupplierThatSleeps20ms);
 
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
     }
 
     @Test
@@ -205,27 +205,27 @@ public class TimerTest extends MetricsTest {
         } catch (Exception ignore) {
         }
 
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
     }
 
     @Test
-    public void measuredSupplierShouldSendInvocationTimeInSeconds() {
+    public void wrappedSupplierShouldSendInvocationTimeInSeconds() {
         Supplier<String> supplier = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::stringSupplierThatSleeps20ms);
+                .wrap(this::stringSupplierThatSleeps20ms);
 
         assertEquals("Got it!", supplier.get());
         assertEquals("Got it!", supplier.get());
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
     @Test
-    public void measuredSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         Supplier<String> supplier = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::stringSupplierThatSleeps20msAndThrowsRuntimeException);
+                .wrap(this::stringSupplierThatSleeps20msAndThrowsRuntimeException);
 
         try {
             supplier.get();
@@ -239,80 +239,80 @@ public class TimerTest extends MetricsTest {
         } catch (Exception ignore) {
         }
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
     /**
      * @see Timer#measure(IntSupplier)
-     * @see Timer#measured(IntSupplier)
+     * @see Timer#wrap(IntSupplier)
      */
     @Test
-    public void measuredIntSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedIntSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         IntSupplier supplier = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::intSupplierThatSleeps20ms);
+                .wrap(this::intSupplierThatSleeps20ms);
 
         assertEquals(1337, supplier.getAsInt());
         assertEquals(1337, supplier.getAsInt());
         
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
 
     /**
      * @see Timer#measure(LongSupplier)
-     * @see Timer#measured(LongSupplier)
+     * @see Timer#wrap(LongSupplier)
      */
     @Test
-    public void measuredLongSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedLongSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         LongSupplier supplier = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::longSupplierThatSleeps20ms);
+                .wrap(this::longSupplierThatSleeps20ms);
 
         assertEquals(31337, supplier.getAsLong());
         assertEquals(31337, supplier.getAsLong());
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
 
     /**
      * @see Timer#measure(DoubleSupplier)
-     * @see Timer#measured(DoubleSupplier)
+     * @see Timer#wrap(DoubleSupplier)
      */
     @Test
-    public void measuredDoubleSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedDoubleSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         DoubleSupplier supplier = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::doubleSupplierThatSleeps20ms);
+                .wrap(this::doubleSupplierThatSleeps20ms);
 
 
         assertEquals(3.1337, supplier.getAsDouble(), 0.0001);
         assertEquals(3.1337, supplier.getAsDouble(), 0.0001);
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
 
     /**
      * @see Timer#measure(BooleanSupplier)
-     * @see Timer#measured(BooleanSupplier)
+     * @see Timer#wrap(BooleanSupplier)
      */
     @Test
-    public void measuredBooleanSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
+    public void wrappedBooleanSupplierShouldSendInvocationTimeInSecondsEvenIfMethodThrowsAnException() {
         BooleanSupplier supplier = withPrefixAndTags.timer("time")
                 .tag("method", "elapsed")
-                .measured(this::booleanSupplierThatSleeps20ms);
+                .wrap(this::booleanSupplierThatSleeps20ms);
 
         assertEquals(true, supplier.getAsBoolean());
         assertEquals(true, supplier.getAsBoolean());
 
-        assertClosureInvocationMeasured();
-        assertClosureInvocationMeasured();
+        assertClosureInvocationWrapped();
+        assertClosureInvocationWrapped();
     }
 
     private void sleep20ms() {
@@ -396,7 +396,7 @@ public class TimerTest extends MetricsTest {
         return Matchers.matchesPattern("test\\.time:\\d+\\.\\d+\\|h\\|#env:junit,method:elapsed");
     }
 
-    private void assertClosureInvocationMeasured() {
+    private void assertClosureInvocationWrapped() {
         String event = server.poll();
         System.out.println(event);
         assertThat(event, Matchers.matchesPattern("test\\.time:\\d+\\.\\d+\\|h\\|#env:junit,method:elapsed"));

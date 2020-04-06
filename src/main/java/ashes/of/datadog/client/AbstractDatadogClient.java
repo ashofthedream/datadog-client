@@ -14,66 +14,60 @@ public abstract class AbstractDatadogClient implements DatadogClient {
     protected final String prefix;
 
     protected final Consumer<Throwable> errorHandler;
-    protected final Tags tags;
+    protected final Tags global;
 
     public AbstractDatadogClient(DatadogBuilder b) {
         this.prefix = b.getPrefix();
         this.errorHandler = b.getErrorHandler();
-        this.tags = b.getTags();
+        this.global = b.tags();
     }
 
-    protected void send(String metric, long value, MetricType type, String... tags) {
+    protected void send(String metric, long value, MetricType type, Tags tags) {
         send(metric, String.valueOf(value), type, tags);
     }
 
-    protected void send(String metric, double value, MetricType type, String... tags) {
+    protected void send(String metric, double value, MetricType type, Tags tags) {
         send(metric, String.valueOf(value), type, tags);
     }
 
-    protected abstract void send(String metric, String value, MetricType type, String... tags);
+    protected abstract void send(String metric, String value, MetricType type, Tags tags);
 
 
     @Override
-    public void count(String metric, long value, String... tags) {
+    public void count(String metric, long value, Tags tags) {
         send(metric, value, COUNTER, tags);
     }
 
 
     @Override
-    public void gauge(String metric, double value, String... tags) {
+    public void gauge(String metric, double value, Tags tags) {
         send(metric, value, GAUGE, tags);
     }
 
     @Override
-    public void gauge(String metric, long value, String... tags) {
+    public void gauge(String metric, long value, Tags tags) {
         send(metric, value, GAUGE, tags);
     }
 
 
     @Override
-    public void histogram(String metric, double value, String... tags) {
+    public void histogram(String metric, double value, Tags tags) {
         send(metric, value, HISTOGRAM, tags);
     }
 
     @Override
-    public void histogram(String metric, long value, String... tags) {
+    public void histogram(String metric, long value, Tags tags) {
         send(metric, value, HISTOGRAM, tags);
     }
 
 
     @Override
-    public void set(String metric, String value, String... tags) {
+    public void set(String metric, String value, Tags tags) {
         send(metric, value, SET, tags);
     }
 
     @Override
-    public void set(String metric, long value, String... tags) {
+    public void set(String metric, long value, Tags tags) {
         send(metric, value, SET, tags);
-    }
-
-
-    @Override
-    public Tags taggable() {
-        return tags;
     }
 }

@@ -57,14 +57,14 @@ public class Timer extends Metric<Timer> {
      * @param unit time unit
      */
     public void elapsed(long time, TimeUnit unit) {
-        client.nanos(name, unit.toNanos(time), tags());
+        client.nanos(name, unit.toNanos(time), tags);
     }
 
     /**
      * @see this#elapsed(long, TimeUnit)
      */
     public void elapsed(Duration duration) {
-        client.nanos(name, duration.toNanos(), tags());
+        client.nanos(name, duration.toNanos(), tags);
     }
 
 
@@ -77,7 +77,7 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public Runnable measured(Runnable runnable) {
+    public Runnable wrap(Runnable runnable) {
         return () -> measure(runnable);
     }
 
@@ -91,26 +91,25 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public CheckedRunnable measuredChecked(CheckedRunnable runnable) {
-        return () -> measuredChecked(runnable);
+    public CheckedRunnable wrapChecked(CheckedRunnable runnable) {
+        return () -> measureChecked(runnable);
     }
 
-    
+
     public <T> void measure(Consumer<T> c, T a) {
         measure(() -> c.accept(a));
-
     }
 
-    public <T> Consumer<T> measured(Consumer<T> c) {
+    public <T> Consumer<T> wrap(Consumer<T> c) {
         return a -> measure(c, a);
     }
 
-    
+
     public void measure(IntConsumer c, int a) {
         measure(() -> c.accept(a));
     }
 
-    public IntConsumer measured(IntConsumer c) {
+    public IntConsumer wrap(IntConsumer c) {
         return a -> measure(c, a);
     }
 
@@ -119,7 +118,7 @@ public class Timer extends Metric<Timer> {
         measure(() -> c.accept(a));
     }
 
-    public LongConsumer measured(LongConsumer c) {
+    public LongConsumer wrap(LongConsumer c) {
         return a -> measure(c, a);
     }
 
@@ -128,7 +127,7 @@ public class Timer extends Metric<Timer> {
         measure(() -> c.accept(a));
     }
 
-    public DoubleConsumer measured(DoubleConsumer c) {
+    public DoubleConsumer wrap(DoubleConsumer c) {
         return a -> measure(c, a);
     }
 
@@ -138,17 +137,16 @@ public class Timer extends Metric<Timer> {
         measure(() -> c.accept(a, b));
     }
 
-    public <A, B> BiConsumer<A, B> measured(BiConsumer<A, B> c) {
+    public <A, B> BiConsumer<A, B> wrap(BiConsumer<A, B> c) {
         return (a, b) -> measure(c, a, b);
     }
-
 
 
     public <A, R> R measure(Function<A, R> f, A a) {
         return measure(() -> f.apply(a));
     }
 
-    public <A, R> Function<A, R> measured(Function<A, R> f) {
+    public <A, R> Function<A, R> wrap(Function<A, R> f) {
         return a -> measure(f, a);
     }
 
@@ -157,7 +155,7 @@ public class Timer extends Metric<Timer> {
         return measure(() -> f.apply(a, b));
     }
 
-    public <A, B, R> BiFunction<A, B, R> measured(BiFunction<A, B, R> f) {
+    public <A, B, R> BiFunction<A, B, R> wrap(BiFunction<A, B, R> f) {
         return (a, b) -> measure(f, a, b);
     }
 
@@ -172,7 +170,7 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public <T> Supplier<T> measured(Supplier<T> s) {
+    public <T> Supplier<T> wrap(Supplier<T> s) {
         return () -> measure(s);
     }
 
@@ -196,7 +194,7 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public IntSupplier measured(IntSupplier s) {
+    public IntSupplier wrap(IntSupplier s) {
         return () -> measure(s);
     }
 
@@ -210,7 +208,7 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public LongSupplier measured(LongSupplier s) {
+    public LongSupplier wrap(LongSupplier s) {
         return () -> measure(s);
     }
 
@@ -224,7 +222,7 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public DoubleSupplier measured(DoubleSupplier s) {
+    public DoubleSupplier wrap(DoubleSupplier s) {
         return () -> measure(s);
     }
 
@@ -238,7 +236,7 @@ public class Timer extends Metric<Timer> {
         }
     }
 
-    public BooleanSupplier measured(BooleanSupplier s) {
+    public BooleanSupplier wrap(BooleanSupplier s) {
         return () -> measure(s);
     }
 

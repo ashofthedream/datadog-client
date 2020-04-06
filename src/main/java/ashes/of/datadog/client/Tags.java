@@ -1,40 +1,38 @@
 package ashes.of.datadog.client;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 
 
 public class Tags implements Taggable<Tags> {
 
-    private final List<Supplier<String>> tags = new ArrayList<>();
+    private final List<Supplier<String>> list = new ArrayList<>();
 
     @Override
     public Tags tag(String tag, Supplier<Object> sup) {
-        tags.add(() -> {
+        list.add(() -> {
             Object o = sup.get();
             return o == null ? tag : tag + ':' + o;
         });
+
         return this;
     }
 
-
-    public Stream<String> stream() {
-        return tags.stream()
-                .map(Supplier::get);
+    @Override
+    public Tags tags() {
+        return this;
     }
 
-
-    public Tags copy() {
-        Tags copy = new Tags();
-        copy.tags.addAll(this.tags);
-
-        return copy;
+    public List<Supplier<String>> list() {
+        return list;
     }
 
+    public boolean isEmpty() {
+        return list.isEmpty();
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -43,17 +41,19 @@ public class Tags implements Taggable<Tags> {
 
         Tags t = (Tags) o;
 
-        return tags.equals(t.tags);
+        return list.equals(t.list);
     }
 
     @Override
     public int hashCode() {
-        return tags.hashCode();
+        return list.hashCode();
     }
 
 
     @Override
     public String toString() {
-        return stream().collect(Collectors.joining(", ", "[", "]"));
+        return list.stream()
+                .map(Supplier::get)
+                .collect(Collectors.joining(", ", "[", "]"));
     }
 }

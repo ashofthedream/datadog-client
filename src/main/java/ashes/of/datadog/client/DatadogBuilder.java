@@ -162,13 +162,6 @@ public class DatadogBuilder implements Taggable<DatadogBuilder> {
         return errorHandler;
     }
 
-
-
-    @Override
-    public Stream<String> stream() {
-        return tags.stream();
-    }
-
     @Override
     public DatadogBuilder tag(String tag, Supplier<Object> sub) {
         tags.tag(tag, sub);
@@ -176,7 +169,8 @@ public class DatadogBuilder implements Taggable<DatadogBuilder> {
     }
 
 
-    public Tags getTags() {
+    @Override
+    public Tags tags() {
         return tags;
     }
 

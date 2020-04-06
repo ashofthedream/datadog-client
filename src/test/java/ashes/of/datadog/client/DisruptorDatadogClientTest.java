@@ -7,8 +7,6 @@ import ashes.of.datadog.server.DatadogServer;
 import org.junit.*;
 
 import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.Assert.assertEquals;
@@ -174,7 +172,7 @@ public class DisruptorDatadogClientTest {
 
     /**
      * @see DatadogClient#event(String, String)
-     * @see DatadogClient#send(Event)
+     * @see DatadogClient#event(Event)
      */
     @Test
     public void eventSendShouldSendEventWithTitleAndText() {
@@ -202,7 +200,7 @@ public class DisruptorDatadogClientTest {
 
     /**
      * @see DatadogClient#serviceCheck(String, ServiceCheck.Status)
-     * @see DatadogClient#send(ServiceCheck)
+     * @see DatadogClient#event(ServiceCheck)
      */
     @Test
     public void serviceCheckShouldSendCheckWithTitleAndStatus() {

@@ -4,7 +4,6 @@ import ashes.of.datadog.client.DatadogClient;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.Date;
 
 public class ServiceCheck extends Metric<ServiceCheck> {
 
@@ -102,7 +101,7 @@ public class ServiceCheck extends Metric<ServiceCheck> {
     
 
     public void send() {
-        client.send(this);
+        client.serviceCheck(this);
     }
 }
 

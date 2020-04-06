@@ -18,7 +18,7 @@ public class Gauge extends Metric<Gauge> {
      * @param value value for gauge
      */
     public void value(long value) {
-        client.gauge(name, value, tags());
+        client.gauge(name, value, tags);
     }
 
     /**
@@ -27,6 +27,6 @@ public class Gauge extends Metric<Gauge> {
      * @param value value for gauge
      */
     public void value(double value) {
-        client.gauge(name, value, tags());
+        client.gauge(name, value, tags);
     }
 }

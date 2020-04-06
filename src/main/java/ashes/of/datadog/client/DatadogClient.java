@@ -23,7 +23,11 @@ public interface DatadogClient {
      * @param value counter value
      * @param tags additional tags
      */
-    void count(String metric, long value, String... tags);
+    default void count(String metric, long value, String... tags) {
+        count(metric, value, new Tags().tags(tags));
+    }
+
+    void count(String metric, long value, Tags tags);
 
     /**
      * Increments the specified counter by one
@@ -35,6 +39,10 @@ public interface DatadogClient {
         count(metric, 1, tags);
     }
 
+    default void increment(String metric, Tags tags) {
+        count(metric, 1, tags);
+    }
+
     /**
      * Decrements the specified counter by one
      *
@@ -42,6 +50,10 @@ public interface DatadogClient {
      * @param tags additional tags
      */
     default void decrement(String metric, String... tags) {
+        count(metric, -1, tags);
+    }
+
+    default void decrement(String metric, Tags tags) {
         count(metric, -1, tags);
     }
 
@@ -61,7 +73,11 @@ public interface DatadogClient {
      * @param value gauge value
      * @param tags additional tags
      */
-    void gauge(String metric, double value, String... tags);
+    default void gauge(String metric, double value, String... tags) {
+        gauge(metric, value, new Tags().tags(tags));
+    }
+
+    void gauge(String metric, double value, Tags tags);
 
     /**
      * Records the latest fixed value for the specified named gauge
@@ -70,7 +86,11 @@ public interface DatadogClient {
      * @param value gauge value
      * @param tags additional tags
      */
-    void gauge(String metric, long value, String... tags);
+    default void gauge(String metric, long value, String... tags) {
+        gauge(metric, value, new Tags().tags(tags));
+    }
+
+    void gauge(String metric, long value, Tags tags);
 
     /**
      * @param metric gauge name
@@ -89,6 +109,10 @@ public interface DatadogClient {
      * @param tags additional tags
      */
     default void millis(String metric, long millis, String... tags) {
+        histogram(metric, millis / 1_000., new Tags().tags(tags));
+    }
+
+    default void millis(String metric, long millis, Tags tags) {
         histogram(metric, millis / 1_000., tags);
     }
 
@@ -100,6 +124,10 @@ public interface DatadogClient {
      * @param tags additional tags
      */
     default void nanos(String metric, long nanos, String... tags) {
+        histogram(metric, nanos / 1_000_000_000., new Tags().tags(tags));
+    }
+
+    default void nanos(String metric, long nanos, Tags tags) {
         histogram(metric, nanos / 1_000_000_000., tags);
     }
 
@@ -119,7 +147,11 @@ public interface DatadogClient {
      * @param value histogram value
      * @param tags additional tags
      */
-    void histogram(String metric, double value, String... tags);
+    default void histogram(String metric, double value, String... tags) {
+        histogram(metric, value, new Tags().tags(tags));
+    }
+
+    void histogram(String metric, double value, Tags tags);
 
     /**
      * Records a value for the histogram
@@ -128,7 +160,11 @@ public interface DatadogClient {
      * @param value histogram value
      * @param tags additional tags
      */
-    void histogram(String metric, long value, String... tags);
+    default void histogram(String metric, long value, String... tags) {
+        histogram(metric, value, new Tags().tags(tags));
+    }
+
+    void histogram(String metric, long value, Tags tags);
 
     /**
      * @param metric histogram name
@@ -146,7 +182,11 @@ public interface DatadogClient {
      * @param value  value
      * @param tags   additional tags
      */
-    void set(String metric, String value, String... tags);
+    default void set(String metric, String value, String... tags) {
+        set(metric, value, new Tags().tags());
+    }
+
+    void set(String metric, String value, Tags tags);
 
     /**
      * Records a value for the specified named set0.
@@ -155,7 +195,11 @@ public interface DatadogClient {
      * @param value value
      * @param tags additional tags
      */
-    void set(String metric, long value, String... tags);
+    default void set(String metric, long value, String... tags) {
+        set(metric, value, new Tags().tags());
+    }
+
+    void set(String metric, long value, Tags tags);
 
     /**
      * @param metric set name
@@ -169,7 +213,7 @@ public interface DatadogClient {
     /**
      * @param event event to send
      */
-    void send(Event event);
+    void event(Event event);
 
     /**
      * @param title event title
@@ -184,7 +228,7 @@ public interface DatadogClient {
     /**
      * Send service check
      */
-    void send(ServiceCheck check);
+    void serviceCheck(ServiceCheck check);
 
     /**
      * @param name service check name
@@ -194,10 +238,4 @@ public interface DatadogClient {
     default ServiceCheck serviceCheck(String name, Status status) {
         return new ServiceCheck(this, name, status);
     }
-
-
-    /**
-     * @return tag builder for client
-     */
-    Tags taggable();
 }

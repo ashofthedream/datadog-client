@@ -20,7 +20,7 @@ public abstract class MetricsTest {
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         server = new DatadogServer(address);
         server.start();
 

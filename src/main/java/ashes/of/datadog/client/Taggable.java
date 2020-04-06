@@ -1,10 +1,7 @@
 package ashes.of.datadog.client;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public interface Taggable<B extends Taggable<B>> {
@@ -54,7 +51,7 @@ public interface Taggable<B extends Taggable<B>> {
      * @return builder
      */
     default B tag(String tag, @Nullable Object sub) {
-        return tag(sub != null ? tag  + ':' + sub : tag);
+        return tag(sub != null ? tag + ':' + sub : tag);
     }
 
     /**
@@ -66,17 +63,8 @@ public interface Taggable<B extends Taggable<B>> {
      */
     B tag(String tag, Supplier<Object> sup);
 
-
     /**
-     * @return stream of built to string tags
+     * @return tags
      */
-    Stream<String> stream();
-
-    /**
-     * @return array of built to string tags
-     */
-    default String[] tags() {
-        return stream()
-                .toArray(String[]::new);
-    }
+    Tags tags();
 }

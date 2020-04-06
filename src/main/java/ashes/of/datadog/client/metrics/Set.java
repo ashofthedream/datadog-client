@@ -16,7 +16,7 @@ public class Set extends Metric<Set> {
      * @param value value for set
      */
     public void add(long value) {
-        client.set(name, value, tags());
+        client.set(name, value, tags);
     }
 
     /**
@@ -25,6 +25,6 @@ public class Set extends Metric<Set> {
      * @param value value for set
      */
     public void add(String value) {
-        client.set(name, value, tags());
+        client.set(name, value, tags);
     }
 }
